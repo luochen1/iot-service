@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.songchengzhong.iot_service.mapper.DeviceMapper">
+    <resultMap id="deviceMap" type="device">
+        <id column="id" property="id"></id>
+        <result column="userId" property="userId"></result>
+        <association property="user" select="com.songchengzhong.iot_service.mapper.UserMapper.findById"
+                     column="userId"></association>
+        <collection property="sensors" select="com.songchengzhong.iot_service.mapper.SensorMapper.findByDeviceId"
+                    column="id"></collection>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_device (name, description, city, longitude, latitude, createdAt, imageURL, userId)
+        VALUES (#{name}, #{description}, #{city}, #{longitude}, #{latitude}, #{createdAt}, #{imageURL}, #{userId})
+    </insert>
+
+    <update id="update">
+        UPDATE t_device
+        SET
+            name        = #{name},
+            description = #{description},
+            city        = #{city},
+            longitude   = #{longitude},
+            latitude    = #{latitude},
+            createdAt   = #{createdAt},
+            imageURL    = #{imageURL},
+            userId      = #{userId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM t_device
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultMap="deviceMap">
+        SELECT *
+        FROM t_device
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="deviceMap">
+        SELECT *
+        FROM t_device
+    </select>
+
+    <select id="toPagedList" resultMap="deviceMap">
+        SELECT *
+        FROM t_device
+        <if test="userId != null">
+            WHERE userId = #{userId}
+        </if>
+        LIMIT #{skipNum}, #{pageSize};
+    </select>
+
+    <select id="findByUserId" resultMap="deviceMap">
+        SELECT *
+        FROM t_device
+        WHERE userId = #{userId}
+    </select>
+</mapper>

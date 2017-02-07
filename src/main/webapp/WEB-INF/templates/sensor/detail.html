@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragment/layout}">
+
+<title layout:fragment="title">用户中心 - 传感器详情</title>
+<style layout:fragment="css">
+    .am-panel-body {
+        padding: 0px;
+    }
+
+    .left-info {
+        text-align: center;
+    }
+</style>
+<div layout:fragment="main-content" th:object="${sensor}" class="am-panel am-panel-default main-content">
+    <div class="am-panel-hd">传感器详情</div>
+    <div class="am-panel-body">
+        <div class="am-g">
+            <div class="am-u-md-3 left-info">
+                <!--数值传感器-->
+                <th:block th:switch="*{sensorTypeId}">
+                    <img th:src="@{/img/sensor.png}" th:case="1">
+                    <img th:src="@{/img/switch.png}" th:case="2">
+                    <img th:src="@{/img/gps.png}" th:case="3">
+                    <img th:src="@{/img/gen.png}" th:case="4">
+                    <img th:src="@{/img/photocam.png}" th:case="5">
+                </th:block>
+                <p><strong th:text="*{name}"></strong></p>
+                <a th:href="@{/sensor/edit/{sensorId}(sensorId=*{id})}" class="am-btn am-btn-success">编辑</a>
+                <a th:href="@{/sensor/delete/{sensorId}(sensorId=*{id})}" class="am-btn am-btn-warning">删除</a>
+
+                <p th:href="*{description}"></p>
+            </div>
+            <div class="am-u-md-9">
+                <div id="chart" style="width: 100%;height: 400px"></div>
+                <p style="text-align: center">URL:<a href="#"
+                                                     th:text='${"http://"} + #{webSite} + ${"/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
+                    &nbsp;&nbsp;&nbsp;
+                    <a id="in-time-btn" class="am-btn am-btn-primary">开启 实时</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="../../../js/echarts.min.js" th:src="@{/js/echarts.min.js}"></script>
+</div>
+<script layout:fragment="js" th:inline="javascript">
+
+
+    $(function () {
+        /*显示所有的数据*/
+        function showAllData() {
+            var chart = echarts.init(document.getElementById("chart"));
+
+            var data = /*[(${option.data})]*/[36, 532, 62, 735, 745, 745, 756, 76, 47];
+            var date = /*[(${option.date})]*/["2013:41234"];
+            var sensorType = /*[(|'${sensor.sensorType.nameCn}'|)]*/'数值传感器';
+            var unit = /*[(|'${sensor.unit}'|)]*/'温度';
+            var symbol = /*[(|'${sensor.symbol}'|)]*/'℃';
+            var option = {
+                title: {//标题
+                    text: sensorType
+                },
+                tooltip: {},
+                legend: {//图例说明
+                    data: [unit + symbol]
+                },
+                xAxis: {//x轴
+                    data: date
+                },
+                yAxis: {},
+                dataZoom: {
+                    type: 'slider',//滑动
+                    show: true,
+                    xAxisIndex: 0,
+                    start: 0,//开始0%
+                    end: 100//结束100%
+                },
+                series: [
+                    {name: unit + symbol, type: 'line'/*'bar','line','scatter'*/, smooth: true, data: data}
+                ]
+            }
+            chart.setOption(option);
+        }
+
+        showAllData();
+
+        var isInTime = false;
+        var sock = null;
+        var api_key = "[(${session.user.apikey})]";
+        var sensorId = [[${sensor.id}]];
+        $("#in-time-btn").click(function () {
+                if (!isInTime) {
+                    this.innerHTML = "关闭 实时";
+                    isInTime = true;
+
+                    //建立socket链接
+                    var url = "ws://" + window.location.host + "/test";
+                    sock = new WebSocket(url);
+                    sock.onopen = function () {
+                        sock.send("in-time:" + api_key + ":" + sensorId);
+                        console.log("客户端open");
+                    }
+
+                    sock.onmessage = function (e) {
+                        console.log("收到消息:" + e.data);
+                    }
+
+                    sock.onclose = function () {
+                        console.log("socket关闭了");
+                    }
+                } else {
+                    this.innerHTML = "开启 实时";
+                    if (sock != null) {
+                        sock.send("close");
+                    }
+                    isInTime = false;
+                }
+            }
+        )
+    })
+</script>
+</html>

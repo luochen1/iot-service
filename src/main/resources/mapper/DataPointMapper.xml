@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.songchengzhong.iot_service.mapper.DataPointMapper">
+    <resultMap id="dataPointMap" type="dataPoint">
+        <id column="id" property="id"></id>
+        <result column="sensorId" property="sensorId"></result>
+        <association property="sensor" select="com.songchengzhong.iot_service.mapper.SensorMapper.findById"
+                     column="sensorId"></association>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_datapoint (value, createdAt, sensorId)
+        VALUES (#{value}, #{createdAt}, #{sensorId})
+    </insert>
+
+    <update id="update">
+        UPDATE t_datapoint
+        SET
+            value     = #{value},
+            createdAt = #{createdAt},
+            sensorId  = #{sensorId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM t_datapoint
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultMap="dataPointMap">
+        SELECT *
+        FROM t_datapoint
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="dataPointMap">
+        SELECT *
+        FROM t_datapoint
+    </select>
+
+    <select id="toPagedList" resultMap="dataPointMap">
+        SELECT *
+        FROM t_datapoint
+        LIMIT #{skipNum}, #{pageSize};
+    </select>
+
+    <select id="findBySensorId" resultMap="dataPointMap">
+        SELECT *
+        FROM t_datapoint
+        WHERE sensorId = #{sensorId}
+        ORDER BY createdAt ASC
+    </select>
+
+    <!--通过传感器的id来进行分页-->
+    <select id="toPagedListBySensorId" resultMap="dataPointMap">
+        SELECT *
+        FROM t_datapoint
+        WHERE sensorId = #{sensorId}
+        ORDER BY createdAt ASC
+        LIMIT #{skipNum}, #{pageSize}
+    </select>
+
+    <!--通过传感器的id和开始结束时间获取数据-->
+    <select id="findByBeginAndEndAndSensorId" resultMap="dataPointMap">
+        SELECT *
+        FROM t_datapoint
+        WHERE sensorId = #{sensorId} AND (createdAt BETWEEN #{begin} AND #{end})
+        ORDER BY createdAt ASC
+    </select>
+
+    <!--通过传感器的id和创建时间来唯一确定一条数据-->
+    <select id="findByCreatedAtAndSensorId" resultMap="dataPointMap">
+        SELECT *
+        FROM t_datapoint
+        WHERE createdAt &lt;= #{createdAt} AND sensorId = #{sensorId}
+        LIMIT 0, 1
+    </select>
+
+    <!--通过创建时间和传感器的id来修改数据点-->
+    <update id="updateByCreatedAtAndSensorId">
+        UPDATE t_datapoint
+        SET
+            value = #{value}
+        WHERE createdAt = #{createAt} AND sensorId = #{sensorId}
+    </update>
+
+    <!--通过创建时间和传感器的id来删除数据点-->
+    <delete id="deleteByCreatedAtAndSensorId">
+        DELETE FROM t_datapoint
+        WHERE createdAt = #{createdAt} AND sensorId = #{sensorId}
+    </delete>
+</mapper>

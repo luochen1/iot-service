@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/websocket
+        http://www.springframework.org/schema/websocket/spring-websocket.xsd">
+    <mvc:interceptors>
+        <!--api认证的拦截器-->
+        <mvc:interceptor>
+            <mvc:mapping path="/api/**/"/>
+            <bean class="com.songchengzhong.iot_service.interceptor.ApiAuthInterceptor"></bean>
+        </mvc:interceptor>
+
+        <!--前台用户的认证拦截器-->
+        <mvc:interceptor>
+            <mvc:mapping path="/profile/**/"/>
+            <mvc:mapping path="/device/**/"/>
+            <bean class="com.songchengzhong.iot_service.interceptor.UserAuthInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+    <!--WebSocket-->
+    <websocket:handlers>
+        <websocket:mapping path="/test" handler="datapointHandler"/>
+    </websocket:handlers>
+    <bean id="datapointHandler" class="com.songchengzhong.iot_service.socket.DatapointHandler"/>
+</beans>

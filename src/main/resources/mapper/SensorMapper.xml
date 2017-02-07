@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.songchengzhong.iot_service.mapper.SensorMapper">
+
+    <resultMap id="sensorMap" type="sensor">
+        <id column="id" property="id"></id>
+        <result column="deviceId" property="deviceId"></result>
+        <result column="sensorTypeId" property="sensorTypeId"></result>
+        <association property="device" select="com.songchengzhong.iot_service.mapper.DeviceMapper.findById"
+                     column="deviceId"></association>
+        <association property="sensorType" select="com.songchengzhong.iot_service.mapper.SensorTypeMapper.findById"
+                     column="sensorTypeId"></association>
+        <collection property="dataPoints" select="com.songchengzhong.iot_service.mapper.DataPointMapper.findBySensorId"
+                    column="id"></collection>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_sensor (name, description, unit, symbol, createdAt, deviceId, sensorTypeId)
+        VALUES (#{name}, #{description}, #{unit}, #{symbol}, #{createdAt}, #{deviceId}, #{sensorTypeId})
+    </insert>
+
+    <update id="update">
+        UPDATE t_sensor
+        SET
+            name         = #{name},
+            description  = #{description},
+            unit         = #{unit},
+            symbol       = #{symbol},
+            createdAt    = #{createdAt},
+            deviceId     = #{deviceId},
+            sensorTypeId = #{sensorTypeId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM t_sensor
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultMap="sensorMap">
+        SELECT *
+        FROM t_sensor
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="sensorMap">
+        SELECT *
+        FROM t_sensor
+    </select>
+
+    <select id="toPagedList" resultMap="sensorMap">
+        SELECT *
+        FROM t_sensor
+        <if test="deviceId != null">
+            WHERE deviceId = #{deviceId}
+        </if>
+        LIMIT #{skipNum}, #{pageSize};
+    </select>
+
+    <select id="findByDeviceId" resultMap="sensorMap">
+        SELECT *
+        FROM t_sensor
+        WHERE deviceId = #{deviceId}
+    </select>
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.songchengzhong.iot_service.mapper.SensorTypeMapper">
+    <select id="findById" resultType="sensorType">
+        SELECT *
+        FROM t_sensor_type
+        WHERE id = #{id}
+    </select>
+    <select id="findAll" resultType="sensorType">
+        SELECT *
+        FROM iot_service.t_sensor_type
+    </select>
+</mapper>

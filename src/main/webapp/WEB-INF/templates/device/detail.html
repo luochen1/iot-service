@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragment/layout}">
+<title layout:fragment="title">用户中心 - 管理设备</title>
+<style layout:fragment="css">
+    .am-panel-body {
+        padding-left: 10px;
+        padding-bottom: 15px;
+    }
+
+    .device-list {
+        display: inline-block;
+        float: right;
+        height: 30px;
+        margin-right: 10px;
+        margin-top: 4px;
+        padding: 5px;
+        color: #000000;
+    }
+
+    .device-list:hover {
+        cursor: pointer;
+        color: #69AC00;
+    }
+
+    .device-list-active {
+        background-color: #ffffff;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        border: 1px solid #c7c7c7;
+        border-bottom: none;
+    }
+
+    .am-panel-body .am-u-md-6 {
+        padding: 20px 35px;
+    }
+
+    #add-sensor-btn {
+        margin-bottom: 4px;
+    }
+
+    .am-panel-body .am-g {
+        padding-top: 10px;
+    }
+</style>
+<div layout:fragment="main-content" class="am-panel am-panel-default main-content">
+    <div class="am-panel-hd">设备管理
+        <a class="device-list" th:each="device:${devices}" th:text="${device.name}"
+           th:classappend="${device.id eq selectedDevice.id?'device-list-active':''}"
+           th:href="@{/device/detail/{deviceId}(deviceId=${device.id})}"
+        ></a>
+    </div>
+    <div class="am-panel-body">
+        <p th:if="${msg}" th:text="${msg}" class="am-text-danger"></p>
+        <th:block th:unless="${msg}">
+            <div class="am-g">
+                <div class="am-u-md-4">
+                    <div>
+                        <h4>设备名称:</h4>
+                        <p th:text="${selectedDevice.name}">></p>
+                        <h4>介绍:</h4>
+                        <p th:text="${selectedDevice.description}">描述XXXXXXXXXXXXXXXXXX</p>
+                        <h4>创建于:</h4>
+                        <p th:text="${#calendars.format(selectedDevice.createdAt,'yyyy年MM月dd日 HH:mm:ss')}">
+                            描述XXXXXXXXXXXXXXXXXX</p>
+                    </div>
+                    <div>
+                        <a th:href="@{/device/edit/{deviceId}(deviceId=${selectedDevice.id})}"
+                           class="am-btn am-btn-success">编辑</a>
+                        <a th:href="@{/device/delete/{deviceId}(deviceId=${selectedDevice.id})}" class="am-btn
+                   am-btn-warning" onclick="return confirm('确定删除这个设备吗?')">删除</a>
+                    </div>
+                    <div>
+                        <h4>设备图片</h4>
+                        <img th:src='@{${(not #strings.isEmpty(selectedDevice.imageURL))?selectedDevice.imageURL:"/img/empty.jpg"}}'
+                             style="width: 250px;height: 250px;border: 1px solid darkgrey;">
+
+                        <form method="post"
+                              th:action="@{/device/image-upload/{deviceId}(deviceId=${selectedDevice.id})}"
+                              enctype="multipart/form-data">
+                            <input type="file" name="imageFile" id="imageFile"
+                                   onchange="confirm('确定上传吗?')?this.form.submit():this.form.reset()" class="am-hide"/>
+                            <a class="am-btn am-btn-default" id="upload-btn" onclick="imageFile.click()">上传</a>
+                        </form>
+                    </div>
+
+                </div>
+                <div class="am-u-md-8">
+                    <h4>传感器</h4>
+                    <a th:href="@{/sensor/create(deviceId=${selectedDevice.id})}"
+                       class="am-btn am-btn-sm am-btn-success" id="add-sensor-btn">+增加一个传感器</a>
+                    <table class="am-table am-table-striped">
+                        <tr>
+                            <th>名称</th>
+                            <th>类型</th>
+                            <th>创建于</th>
+                            <th>操作</th>
+                        </tr>
+                        <tr th:each="sensor : ${selectedDevice.sensors}">
+                            <td th:text="${sensor.name}">XXXX</td>
+                            <td th:text="${sensor.sensorType.nameCn}">XXXX</td>
+                            <td th:text="${#calendars.format(sensor.createdAt,'yyyy-MM-dd HH:mm:ss')}">XXXX</td>
+                            <td><a th:href="@{/sensor/detail/{sensorId}(sensorId=${sensor.id})}"
+                                   class="am-btn am-btn-primary">详情</a></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </th:block>
+
+    </div>
+</div>
+<script layout:fragment="js">
+</script>
+</html>

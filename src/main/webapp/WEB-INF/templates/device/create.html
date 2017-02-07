@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragment/layout}">
+
+<title layout:fragment="title">用户中心 - 增加新设备</title>
+<style layout:fragment="css">
+    #allmap {
+        width: 80%;
+        height: 250px;
+        margin-bottom: 4px;
+    }
+
+    input#longitude, input#latitude {
+        width: 200px;
+        display: inline;
+    }
+</style>
+<div layout:fragment="main-content" class="am-panel am-panel-default main-content">
+    <script type="text/javascript"
+    src="http://api.map.baidu.com/api?v=2.0&ak=bNMZyf8rA5cvtrmhlKu6k4hiQ968eplG"></script>
+    <div class="am-panel-hd">增加新设备</div>
+    <div class="am-panel-body">
+        <div class="am-alert am-alert-danger" data-am-alert th:if="${msg !=null}">
+            <button type="button" class="am-close">&times;</button>
+            <p th:text="${msg}"></p>
+        </div>
+        <form class="am-form am-g" method="post" th:action="@{/device/create}" th:object="${device}">
+            <div class="am-form-group am-u-md-4">
+                <label for="name">设备名称</label>
+                <input th:value="*{name}" type="text" id="name" name="name" required min="1" max="30"
+                       placeholder="给你的设备起个容易记住的名字"/>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-11">
+                <label for="description">描述</label>
+                <textarea th:text="*{description}" id="description" name="description" style="resize: none" rows="2"
+                          maxlength="50"
+                          placeholder="不超过50个字符"></textarea>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-4">
+                <label for="city">所在城市</label>
+                <input th:value="*{city}" type="text" id="city" name="city" placeholder="例如: 上海" required/>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-11">
+                <label>地理位置数据</label>
+                <div id="allmap"></div>
+                经度:
+                <input th:value="*{longitude}" class="map" type="text" id="longitude" name="longitude"
+                       placeholder="经度"/>
+                维度:
+                <input th:value="*{latitude}" class="map" type="text" id="latitude" name="latitude" placeholder="纬度"/>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-12">
+                <input type="submit" value="保存" class="am-btn am-btn-success"/>
+            </div>
+        </form>
+    </div>
+</div>
+<script layout:fragment="js">
+    var map = new BMap.Map("allmap");
+    map.centerAndZoom(new BMap.Point(116.404, 39.915), 12);
+    var marker = null;
+    map.addEventListener("click", function (e) {
+        if (marker != null) {
+            map.removeOverlay(marker);
+        }
+        $("#longitude").val(e.point.lng);
+        $("#latitude").val(e.point.lat);
+        marker = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat)); // 创建点
+        map.addOverlay(marker);    //增加点
+    });
+    new BMap.LocalCity().get(function (result) {
+        var cityName = result.name;
+        map.setCenter(cityName);
+    });
+    map.enableScrollWheelZoom(true);
+</script>
+</html>

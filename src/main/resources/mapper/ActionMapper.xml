@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.songchengzhong.iot_service.mapper.ActionMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_action (name, value, actionTypeId, userId)
+        VALUES (#{name}, #{value}, #{actionTypeId}, #{userId})
+    </insert>
+
+    <update id="update" parameterType="action">
+        UPDATE t_action
+        SET
+            name         = #{name},
+            value        = #{value},
+            actionTypeId = #{actionTypeId},
+            userId       = #{userId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM t_action
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById" parameterType="int" resultType="action">
+        SELECT *
+        FROM t_action
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultType="action">
+        SELECT *
+        FROM t_action
+    </select>
+
+    <select id="toPagedList" resultType="action">
+        SELECT *
+        FROM t_action
+        LIMIT #{skipNum}, #{pageSize};
+    </select>
+
+</mapper>

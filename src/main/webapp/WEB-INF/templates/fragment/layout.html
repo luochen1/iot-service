@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../css/amazeui.min.css" th:href="@{/css/amazeui.min.css}">
+    <link rel="stylesheet" href="../../../css/layout.css" th:href="@{/css/layout.css}">
+    <title layout:fragment="title">layout</title>
+    <style layout:fragment="css">
+
+    </style>
+    <script src="../../../js/jquery.min.js" th:href="@{/js/jquery.min.js}"></script>
+    <script src="../../../js/amazeui.js" th:href="@{/js/amazeui.js}"></script>
+    <script src="../../../js/amazeui.ie8polyfill.js" th:href="@{/js/amazeui.ie8polyfill.js}"></script>
+    <script src="../../../js/amazeui.widgets.helper.js" th:href="@{/js/amazeui.widgets.helper.js}"></script>
+</head>
+<body>
+<div class="am-g container">
+    <div class="am-u-md-2 sidebar" th:object='${#session.getAttribute("user")}'>
+        <h1 class="am-text-center">物联云☁️</h1>
+        <p class="am-text-right">欢迎您,<span th:text='*{username}'>sczero</span></p>
+        <p class="am-text-right">您上次登录于:</p>
+        <p class="am-text-right" th:if="*{loginTime!=null}"
+           th:text="*{#calendars.format(loginTime,'yyyy-MM-dd HH:mm:ss')}">暂无记录</p>
+        <p><a th:href="@{/logout}" href="#" class="logout-link">注销</a></p>
+        <div class="am-cf"></div>
+        <div class="nav-list">
+            <div class="nav-section"><a>我的账户</a></div>
+            <div class="am-cf"></div>
+            <ul class="nav-section-list">
+                <li><a th:href="@{/profile}">账户设置</a></li>
+                <li><a th:href="@{/profile/password}">修改密码</a></li>
+            </ul>
+            <div class="am-cf"></div>
+            <div class="nav-section"><a>我的设备</a></div>
+            <div class="am-cf"></div>
+            <ul class="nav-section-list">
+                <li><a th:href="@{/device/create}">增加新设备</a></li>
+                <li><a th:href="@{/device/detail/}">管理设备</a></li>
+            </ul>
+            <div class="am-cf"></div>
+            <div class="nav-section"><a href="">我的动作</a></div>
+            <div class="am-cf"></div>
+            <div class="nav-section"><a href="">API文档</a></div>
+            <div class="am-cf"></div>
+        </div>
+    </div>
+    <div class="am-u-md-10 content">
+        <h1>欢迎使用</h1>
+        <p>——免费、开放的平台，快速开启您的物联网时代</p>
+        <div class="am-panel am-panel-default main-content" layout:fragment="main-content">
+        </div>
+    </div>
+</div>
+<script>
+    $(".nav-section").on("click", function () {
+        var list = $(this).next().next();
+        var allList = $(".nav-section-list").not(list);
+        if (list != null) {
+            list.animate({height: "50px"}, 300, 'linear');
+        }
+        if (allList != null) {
+            allList.animate({height: "0px"}, 300, 'linear');
+        }
+    })
+</script>
+<script layout:fragment="js"></script>
+</body>
+</html>
