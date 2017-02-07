@@ -91,4 +91,10 @@
         DELETE FROM t_datapoint
         WHERE createdAt = #{createdAt} AND sensorId = #{sensorId}
     </delete>
+
+    <select id="findByBeginTimeAndSensorId" resultMap="dataPointMap">
+        SELECT *
+        FROM t_datapoint
+        WHERE createdAt >= #{beginTime} AND sensorId = #{sensorId}
+    </select>
 </mapper>

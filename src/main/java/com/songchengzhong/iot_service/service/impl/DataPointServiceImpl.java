@@ -3,10 +3,12 @@ package com.songchengzhong.iot_service.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.songchengzhong.iot_service.entity.DataPoint;
+import com.songchengzhong.iot_service.entity.Sensor;
 import com.songchengzhong.iot_service.entity.User;
 import com.songchengzhong.iot_service.repository.DataPointRepository;
 import com.songchengzhong.iot_service.repository.SensorRepository;
 import com.songchengzhong.iot_service.service.DataPointService;
+import com.songchengzhong.iot_service.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,9 @@ public class DataPointServiceImpl implements DataPointService {
 
     @Autowired
     SensorRepository sensorRepository;
+
+    @Autowired
+    UserService userService;
 
     @Override
     public boolean insert(DataPoint entity, User user) {
@@ -95,20 +100,45 @@ public class DataPointServiceImpl implements DataPointService {
     }
 
     @Override
-    public Map<String, String> getJsonOfNumbericl(List<DataPoint> dataPoints) {
-        Map<String, String> map = new HashMap<>();
+    public Map<String, Object[]> getDataAndDateMap(List<DataPoint> dataPoints) {
+        Map<String, Object[]> map = new HashMap<>();
         Object[] data = dataPoints.stream().map(p -> Double.parseDouble(p.getValue())).toArray();
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Object[] date = dataPoints.stream()
                 .map(p -> dateFormat.format(p.getCreatedAt()))
                 .toArray();
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            map.put("data", mapper.writeValueAsString(data));
-            map.put("date", mapper.writeValueAsString(date));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        map.put("data", data);
+        map.put("date", date);
         return map;
+    }
+
+    @Override
+    public Map<String, Object> getInTimeData(String socketMsg, Date beginTime, Integer count) {
+        String[] strings = socketMsg.split(":");
+        if (strings.length == 3) {//有三个参数
+            String apikey = strings[1];
+            User user = userService.findByApiKey(apikey);//找到用户
+            if (user != null) {
+                int sensorId = Integer.parseInt(strings[2]);
+                Sensor sensor = sensorRepository.findById(sensorId);//找到传感器
+                if (sensor != null && sensor.getDevice().getUserId() == user.getId()) {
+                    List<DataPoint> dataPoints = dataPointRepository.findByBeginTimeAndSensorId(beginTime, sensorId);
+                    if (dataPoints != null && dataPoints.size() > 0) {
+                        Map<String, Object[]> dataAndDateMap = getDataAndDateMap(dataPoints);
+                        ObjectMapper mapper = new ObjectMapper();
+                        try {
+                            String s = mapper.writeValueAsString(dataAndDateMap);
+                            Map<String, Object> resultMap = new HashMap<>();
+                            resultMap.put("returnMsg", s);
+                            resultMap.put("returnCount", dataPoints.size());
+                            return resultMap;
+                        } catch (JsonProcessingException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

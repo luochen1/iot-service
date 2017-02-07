@@ -1,5 +1,7 @@
 package com.songchengzhong.iot_service.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.songchengzhong.iot_service.entity.DataPoint;
 import com.songchengzhong.iot_service.entity.Sensor;
 import com.songchengzhong.iot_service.entity.SensorType;
@@ -58,7 +60,7 @@ public class SensorController {
     }
 
     @GetMapping("/detail/{id}")
-    public String detail(@PathVariable Integer id, Model model) {
+    public String detail(@PathVariable Integer id, Model model) throws JsonProcessingException {
         User user = (User) session.getAttribute("user");
         Sensor sensor = sensorService.findById(id, user);
         List<DataPoint> dataPoints = sensor.getDataPoints();//找到所有的数据
@@ -70,7 +72,7 @@ public class SensorController {
         } else {
             switch (sensor.getSensorTypeId()) {
                 case 1://数值传感器
-                    model.addAttribute("option", dataPointService.getJsonOfNumbericl(dataPoints));
+                    model.addAttribute("option", new ObjectMapper().writeValueAsString(dataPointService.getDataAndDateMap(dataPoints)));
                     break;
                 case 2:
                     break;

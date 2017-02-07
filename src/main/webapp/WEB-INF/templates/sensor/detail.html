@@ -48,15 +48,15 @@
 
 
     $(function () {
+        var chart = echarts.init(document.getElementById("chart"));
+        var sensorType = /*[(|'${sensor.sensorType.nameCn}'|)]*/'数值传感器';
+        var unit = /*[(|'${sensor.unit}'|)]*/'温度';
+        var symbol = /*[(|'${sensor.symbol}'|)]*/'℃';
         /*显示所有的数据*/
         function showAllData() {
-            var chart = echarts.init(document.getElementById("chart"));
-
-            var data = /*[(${option.data})]*/[36, 532, 62, 735, 745, 745, 756, 76, 47];
-            var date = /*[(${option.date})]*/["2013:41234"];
-            var sensorType = /*[(|'${sensor.sensorType.nameCn}'|)]*/'数值传感器';
-            var unit = /*[(|'${sensor.unit}'|)]*/'温度';
-            var symbol = /*[(|'${sensor.symbol}'|)]*/'℃';
+            var dataAndDate = /*[(${option})]*/[];
+            var data = dataAndDate.data;
+            var date = dataAndDate.date;
             var option = {
                 title: {//标题
                     text: sensorType
@@ -85,36 +85,45 @@
 
         showAllData();
 
-        var isInTime = false;
         var sock = null;
         var api_key = "[(${session.user.apikey})]";
         var sensorId = [[${sensor.id}]];
         $("#in-time-btn").click(function () {
-                if (!isInTime) {
-                    this.innerHTML = "关闭 实时";
-                    isInTime = true;
+                this.style.display = "none";
+                //建立socket链接
+                var url = "ws://" + window.location.host + "/test";
+                sock = new WebSocket(url);
+                sock.onopen = function () {
+                    sock.send("in-time:" + api_key + ":" + sensorId);
+                    console.log("客户端open");
+                }
 
-                    //建立socket链接
-                    var url = "ws://" + window.location.host + "/test";
-                    sock = new WebSocket(url);
-                    sock.onopen = function () {
-                        sock.send("in-time:" + api_key + ":" + sensorId);
-                        console.log("客户端open");
+                sock.onmessage = function (e) {
+                    if (e != null && e != "") {
+                        var temp = JSON.parse(e.data);
+                        var data = temp.data.length > 10 ? temp.data.slice(-10) : temp.data;
+                        var date = temp.date.length > 10 ? temp.date.slice(-10) : temp.date;
+                        chart.setOption({
+                            title: {//标题
+                                text: sensorType
+                            },
+                            tooltip: {},
+                            legend: {//图例说明
+                                data: [unit + symbol]
+                            },
+                            xAxis: {//x轴
+                                data: date
+                            },
+                            yAxis: {},
+                            series: [
+                                {name: unit + symbol, type: 'line'/*'bar','line','scatter'*/, smooth: true, data: data}
+                            ]
+                        })
                     }
+                }
 
-                    sock.onmessage = function (e) {
-                        console.log("收到消息:" + e.data);
-                    }
-
-                    sock.onclose = function () {
-                        console.log("socket关闭了");
-                    }
-                } else {
-                    this.innerHTML = "开启 实时";
-                    if (sock != null) {
-                        sock.send("close");
-                    }
-                    isInTime = false;
+                sock.onclose = function () {
+                    console.log("socket关闭了");
                 }
             }
         )

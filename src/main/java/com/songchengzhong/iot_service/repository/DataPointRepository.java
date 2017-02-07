@@ -33,4 +33,6 @@ public interface DataPointRepository {
     boolean updateByCreatedAtAndSensorId(DataPoint entity);
 
     boolean deleteByCreatedAtAndSensorId(DataPoint entity);
+
+    List<DataPoint> findByBeginTimeAndSensorId(Date beginTime,int sensorId);
 }

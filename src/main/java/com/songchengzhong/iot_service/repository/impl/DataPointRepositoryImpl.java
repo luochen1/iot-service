@@ -173,4 +173,18 @@ public class DataPointRepositoryImpl implements DataPointRepository {
             sqlSession.close();
         }
     }
+
+    @Override
+    public List<DataPoint> findByBeginTimeAndSensorId(Date beginTime, int sensorId) {
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        try {
+            Map<String, Object> map = new HashMap<>();
+            map.put("beginTime", beginTime);
+            map.put("sensorId", sensorId);
+            List<DataPoint> result = sqlSession.selectList("com.songchengzhong.iot_service.mapper.DataPointMapper.findByBeginTimeAndSensorId", map);
+            return result;
+        } finally {
+            sqlSession.close();
+        }
+    }
 }
