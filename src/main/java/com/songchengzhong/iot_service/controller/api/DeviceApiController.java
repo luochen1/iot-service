@@ -58,7 +58,7 @@ public class DeviceApiController {
         User user = (User) request.getAttribute("user");
         Device device = deviceService.findById(id, user);
         if (device != null) {
-            return new ResponseEntity<>(device, HttpStatus.FOUND);
+            return new ResponseEntity<>(device, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -69,7 +69,7 @@ public class DeviceApiController {
         User user = (User) request.getAttribute("user");
         List<Device> devices = deviceService.findAll(user);
         if (devices != null && devices.size() > 0) {
-            return new ResponseEntity<>(devices, HttpStatus.FOUND);
+            return new ResponseEntity<>(devices, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

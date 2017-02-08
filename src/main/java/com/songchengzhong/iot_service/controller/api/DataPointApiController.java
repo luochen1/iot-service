@@ -86,7 +86,7 @@ public class DataPointApiController {
         User user = (User) request.getAttribute("user");
         DataPoint dataPoint = dataPointService.findByTimestampAndSensorId(user, timestamp, sensorId);
         if (dataPoint != null) {
-            return new ResponseEntity<>(dataPoint.getValue(), HttpStatus.FOUND);
+            return new ResponseEntity<>(dataPoint.getValue(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -103,7 +103,7 @@ public class DataPointApiController {
         User user = (User) request.getAttribute("user");
         List<DataPoint> dataPoints = dataPointService.findBySensorId(user, sensorId);
         if (dataPoints != null && dataPoints.size() > 0) {
-            return new ResponseEntity<>(dataPoints, HttpStatus.FOUND);
+            return new ResponseEntity<>(dataPoints, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -122,7 +122,7 @@ public class DataPointApiController {
         User user = (User) request.getAttribute("user");
         List<DataPoint> dataPoints = dataPointService.toPagedListBySensorId(user, sensorId, pageNum, pageSize);
         if (dataPoints != null && dataPoints.size() > 0) {
-            return new ResponseEntity<>(dataPoints, HttpStatus.FOUND);
+            return new ResponseEntity<>(dataPoints, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -141,7 +141,7 @@ public class DataPointApiController {
         User user = (User) request.getAttribute("user");
         List<DataPoint> dataPoints = dataPointService.findByBeginAndEndAndSensorId(user, sensorId, begin, end);
         if (dataPoints != null && dataPoints.size() > 0) {
-            return new ResponseEntity<>(dataPoints, HttpStatus.FOUND);
+            return new ResponseEntity<>(dataPoints, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

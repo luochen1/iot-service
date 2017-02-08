@@ -61,7 +61,7 @@ public class SensorApiController {
         User user = (User) request.getAttribute("user");
         Sensor device = sensorService.findById(id, user, deviceId);
         if (device != null) {
-            return new ResponseEntity<>(device, HttpStatus.FOUND);
+            return new ResponseEntity<>(device, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -72,7 +72,7 @@ public class SensorApiController {
         User user = (User) request.getAttribute("user");
         List<Sensor> devices = sensorService.findAll(user, deviceId);
         if (devices != null && devices.size() > 0) {
-            return new ResponseEntity<>(devices, HttpStatus.FOUND);
+            return new ResponseEntity<>(devices, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
