@@ -27,14 +27,16 @@
         <div class="nav-list">
             <div class="nav-section"><a>我的账户</a></div>
             <div class="am-cf"></div>
-            <ul class="nav-section-list">
+            <ul class="nav-section-list"
+                th:style='${#request.getRequestURL().toString().contains("/profile")?"height:50px":""}'>
                 <li><a th:href="@{/profile}">账户设置</a></li>
                 <li><a th:href="@{/profile/password}">修改密码</a></li>
             </ul>
             <div class="am-cf"></div>
             <div class="nav-section"><a>我的设备</a></div>
             <div class="am-cf"></div>
-            <ul class="nav-section-list">
+            <ul class="nav-section-list"
+                th:style='${#request.getRequestURL().toString().contains("/device")||#request.getRequestURL().toString().contains("/sensor")?"height:50px":""}'>
                 <li><a th:href="@{/device/create}">增加新设备</a></li>
                 <li><a th:href="@{/device/detail/}">管理设备</a></li>
             </ul>

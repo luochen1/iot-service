@@ -32,7 +32,7 @@ public class DataPointApiController {
         User user = (User) request.getAttribute("user");
         dataPoint.setSensorId(sensorId);//设置传感器的id
         if (dataPointService.insert(dataPoint, user)) {
-            return new ResponseEntity<>(dataPoint.getId(), HttpStatus.OK);
+            return new ResponseEntity<>(dataPoint.getCreatedAt(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -86,7 +86,7 @@ public class DataPointApiController {
         User user = (User) request.getAttribute("user");
         DataPoint dataPoint = dataPointService.findByTimestampAndSensorId(user, timestamp, sensorId);
         if (dataPoint != null) {
-            return new ResponseEntity<>(dataPoint, HttpStatus.FOUND);
+            return new ResponseEntity<>(dataPoint.getValue(), HttpStatus.FOUND);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

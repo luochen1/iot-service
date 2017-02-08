@@ -75,6 +75,7 @@
         SELECT *
         FROM t_datapoint
         WHERE createdAt &lt;= #{createdAt} AND sensorId = #{sensorId}
+        ORDER BY createdAt DESC
         LIMIT 0, 1
     </select>
 
@@ -92,6 +93,7 @@
         WHERE createdAt = #{createdAt} AND sensorId = #{sensorId}
     </delete>
 
+    <!--通过特定的时间筛选在这个时间之后的所有数据-->
     <select id="findByBeginTimeAndSensorId" resultMap="dataPointMap">
         SELECT *
         FROM t_datapoint

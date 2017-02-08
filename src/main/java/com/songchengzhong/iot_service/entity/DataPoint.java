@@ -16,6 +16,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DataPoint {
+
+    @JsonIgnore
     private long id;
 
     private String value;

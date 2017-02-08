@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by songchengzhong on 2017/1/17.
@@ -64,7 +67,7 @@ public class SensorController {
         User user = (User) session.getAttribute("user");
         Sensor sensor = sensorService.findById(id, user);
         List<DataPoint> dataPoints = sensor.getDataPoints();//找到所有的数据
-        if(dataPoints == null){
+        if (dataPoints == null) {
             System.out.println("null");
         }
         if (sensor == null) {
@@ -74,7 +77,9 @@ public class SensorController {
                 case 1://数值传感器
                     model.addAttribute("option", new ObjectMapper().writeValueAsString(dataPointService.getDataAndDateMap(dataPoints)));
                     break;
-                case 2:
+                case 2://开关
+                    DataPoint dataPoint = dataPointService.findByTimestampAndSensorId(user, new Date().getTime(), sensor.getId());
+                    model.addAttribute("isOpen", dataPoint != null ? dataPoint.getValue() : "0");
                     break;
                 case 3:
                     break;
@@ -86,6 +91,21 @@ public class SensorController {
             model.addAttribute("sensor", sensor);
             return "sensor/detail";
         }
+    }
 
+    @PostMapping(value = "/change-switch", produces = "application/json")
+    @ResponseBody
+    public Map<String, Object> changeSwitch(@RequestParam Integer sensorId, @RequestParam String isOpen) {
+        User user = (User) session.getAttribute("user");
+        String before = isOpen;
+        boolean b = dataPointService.insert(new DataPoint(0, isOpen + "", new Date(), sensorId, null), user);
+        Map<String, Object> map = new HashMap<>();
+        map.put("result", b);
+        if (b) {
+            map.put("value", isOpen);
+        } else {
+            map.put("value", before);
+        }
+        return map;
     }
 }
