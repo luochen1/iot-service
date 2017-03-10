@@ -53,7 +53,7 @@
             <div class="am-u-md-9" th:if="*{sensorTypeId == 1}">
                 <div id="chart" style="width: 100%;height: 400px"></div>
                 <p style="text-align: center">URL:<a href="#"
-                                                     th:text='${"http://"} + #{webSite} + ${"/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
+                                                     th:text='${"http://"} + #{webSite} + ${"/api/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
                     &nbsp;&nbsp;&nbsp;
                     <a id="in-time-btn" class="am-btn am-btn-primary">开启 实时</a>
                 </p>
@@ -65,7 +65,7 @@
                          th:styleappend="${isOpen == '1'}?' background-position-x:-65px'">
                     </div>
                     <p style="text-align: center">URL:<a href="#"
-                                                         th:text='${"http://"} + #{webSite} + ${"/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
+                                                         th:text='${"http://"} + #{webSite} + ${"/api/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
                     </p>
                 </div>
             </div>
@@ -124,11 +124,19 @@
                         console.log("客户端open");
                     }
 
+                    var data = [];
+                    var date = [];
                     sock.onmessage = function (e) {
                         if (e != null && e != "") {
-                            var temp = JSON.parse(e.data);
-                            var data = temp.data.length > 10 ? temp.data.slice(-10) : temp.data;
-                            var date = temp.date.length > 10 ? temp.date.slice(-10) : temp.date;
+                            var msg = JSON.parse(e.data);
+                            data.push(msg.data);
+                            if (data.length > 10) {
+                                data.pop();
+                            }
+                            date.push(msg.date);
+                            if (date.length > 10) {
+                                date.pop();
+                            }
                             chart.setOption({
                                 title: {//标题
                                     text: sensorType + "(实时)"

@@ -1,82 +1,75 @@
 package com.songchengzhong.iot_service.socket;
 
 import com.songchengzhong.iot_service.common.Strings;
-import com.songchengzhong.iot_service.entity.User;
 import com.songchengzhong.iot_service.service.DataPointService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Created by songchengzhong on 2017/2/7.
  */
+@Component("datapointHandler")
 public class DatapointHandler extends TextWebSocketHandler {
 
-    DataPointService dataPointService;
-
-    public DatapointHandler(DataPointService dataPointService) {
-        this.dataPointService = dataPointService;
-    }
+    public static Map<String, WebSocketSession> sessionMap = new ConcurrentHashMap<>(1024);
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        System.out.println("连接开启了");
+        System.out.println("socket开启了");
     }
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         String payload = message.getPayload();
-        System.out.println("收到:" + payload);
+        System.out.println("socket收到:" + payload);
 
         //关闭连接
         if ("close".equals(payload)) {
             try {
                 session.close();
+                removeSession(session);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        //即时获取数据
+        //将payload放入map
         if (!Strings.isNullOrEmpty(payload) && payload.contains("in-time")) {
-            Date beginTime = new Date();
-            Integer count = 0;
-            try {
-                while (true) {
-                    Map<String, Object> inTimeData = dataPointService.getInTimeData(payload, beginTime, count);
-                    if (inTimeData != null) {
-                        Integer returnCount = (Integer) inTimeData.get("returnCount");
-                        if (returnCount > count) {
-                            count = returnCount;
-                            session.sendMessage(new TextMessage((String) inTimeData.get("returnMsg")));
-                        }
-                    }
-                    Thread.sleep(1000);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    session.close();
-                    System.out.println("session关闭");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            sessionMap.put(payload, session);
+            System.out.println("现在的map容量:" + sessionMap.size());
         }
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        System.out.println("连接关闭了");
+        System.out.println("socket连接关闭了");
+        removeSession(session);
+    }
+
+    @Override
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+        System.out.println("socket出错了");
+        if (session.isOpen()) {
+            session.close();
+        }
+        removeSession(session);
+    }
+
+    private synchronized static void removeSession(WebSocketSession session) {
+        List<Map.Entry<String, WebSocketSession>> collect = sessionMap.entrySet().stream().filter(p -> p.getValue() == session).collect(Collectors.toList());
+        if (collect != null && collect.size() > 0) {
+            Map.Entry<String, WebSocketSession> entry = collect.get(0);
+            sessionMap.remove(entry.getKey());
+        }
+        System.out.println("现在的map容量:" + sessionMap.size());
     }
 }

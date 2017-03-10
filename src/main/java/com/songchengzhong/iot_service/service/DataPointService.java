@@ -1,8 +1,10 @@
 package com.songchengzhong.iot_service.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.songchengzhong.iot_service.entity.DataPoint;
 import com.songchengzhong.iot_service.entity.User;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +87,6 @@ public interface DataPointService {
 
     /**
      * 通过Socket发来的信息进行即时数据的获取
-     * @param socketMsg
-     * @return
      */
-    Map<String,Object> getInTimeData(String socketMsg, Date beginTime,Integer count);
+    void sendSocketMsg(String mapKey,DataPoint dataPoint) throws IOException;
 }

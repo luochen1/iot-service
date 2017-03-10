@@ -29,5 +29,4 @@
     <websocket:handlers>
         <websocket:mapping path="/test" handler="datapointHandler"/>
     </websocket:handlers>
-    <bean id="datapointHandler" class="com.songchengzhong.iot_service.socket.DatapointHandler"/>
 </beans>

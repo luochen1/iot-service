@@ -1,8 +1,9 @@
-package com.songchengzhong.iot_service.entity;
+package com.songchengzhong.iot_service.view_model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.songchengzhong.iot_service.entity.Device;
+import com.songchengzhong.iot_service.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements Serializable {
+public class SocketUser extends User implements Serializable {
 
     private int id;
 
@@ -40,6 +41,16 @@ public class User implements Serializable {
 
     private String activeCode;
 
-    @JsonIgnore
-    private List<Device> devices;
+    public SocketUser(User user) {
+        id = user.getId();
+        username = user.getUsername();
+        email = user.getEmail();
+        password = user.getPassword();
+        apikey = user.getApikey();
+        introduction = user.getIntroduction();
+        createdAt = user.getCreatedAt();
+        loginTime = user.getLoginTime();
+        isActive = user.isActive();
+        activeCode = user.getActiveCode();
+    }
 }

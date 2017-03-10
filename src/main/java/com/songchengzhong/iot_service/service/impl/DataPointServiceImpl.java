@@ -9,9 +9,14 @@ import com.songchengzhong.iot_service.repository.DataPointRepository;
 import com.songchengzhong.iot_service.repository.SensorRepository;
 import com.songchengzhong.iot_service.service.DataPointService;
 import com.songchengzhong.iot_service.service.UserService;
+import com.songchengzhong.iot_service.socket.DatapointHandler;
+import com.songchengzhong.iot_service.view_model.SocketUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -113,32 +118,11 @@ public class DataPointServiceImpl implements DataPointService {
     }
 
     @Override
-    public Map<String, Object> getInTimeData(String socketMsg, Date beginTime, Integer count) {
-        String[] strings = socketMsg.split(":");
-        if (strings.length == 3) {//有三个参数
-            String apikey = strings[1];
-            User user = userService.findByApiKey(apikey);//找到用户
-            if (user != null) {
-                int sensorId = Integer.parseInt(strings[2]);
-                Sensor sensor = sensorRepository.findById(sensorId);//找到传感器
-                if (sensor != null && sensor.getDevice().getUserId() == user.getId()) {
-                    List<DataPoint> dataPoints = dataPointRepository.findByBeginTimeAndSensorId(beginTime, sensorId);
-                    if (dataPoints != null && dataPoints.size() > 0) {
-                        Map<String, Object[]> dataAndDateMap = getDataAndDateMap(dataPoints);
-                        ObjectMapper mapper = new ObjectMapper();
-                        try {
-                            String s = mapper.writeValueAsString(dataAndDateMap);
-                            Map<String, Object> resultMap = new HashMap<>();
-                            resultMap.put("returnMsg", s);
-                            resultMap.put("returnCount", dataPoints.size());
-                            return resultMap;
-                        } catch (JsonProcessingException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }
+    public void sendSocketMsg(String mapKey, DataPoint dataPoint) throws IOException {
+        WebSocketSession session = DatapointHandler.sessionMap.get(mapKey);
+        if (session != null) {
+            session.sendMessage(new TextMessage("{\"data\":" + dataPoint.getValue()
+                    + ",\"date\":\"" + new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(dataPoint.getCreatedAt()) + "\"}"));
         }
-        return null;
     }
 }

@@ -1,16 +1,23 @@
 package com.songchengzhong.iot_service.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.songchengzhong.iot_service.common.Strings;
 import com.songchengzhong.iot_service.entity.User;
 import com.songchengzhong.iot_service.repository.UserRepository;
 import com.songchengzhong.iot_service.service.EmailService;
 import com.songchengzhong.iot_service.service.UserService;
 import com.songchengzhong.iot_service.common.UUIDs;
 import com.songchengzhong.iot_service.view_model.RegisterUser;
+import com.songchengzhong.iot_service.view_model.SocketUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import redis.clients.jedis.Jedis;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.Socket;
 import java.util.Date;
 import java.util.List;
 
@@ -70,8 +77,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByApiKey(String apiKey) {
-        return userRepository.findByApiKey(apiKey);
+    public SocketUser findByApiKey(String apiKey) throws JsonProcessingException {
+        String str = "apiKey:" + apiKey;
+        Jedis jedis = new Jedis("localhost", 6379);
+        String json = jedis.get(str);//从redis中获取apikey
+        if (Strings.isNullOrEmpty(json)) {
+            User user = userRepository.findByApiKey(apiKey);
+            SocketUser socketUser = null;
+            if (user != null) {
+                socketUser = new SocketUser(user);
+                //将从数据库中的user写入redis,利用json序列化
+                jedis.set(str, new ObjectMapper().writeValueAsString(socketUser));
+                jedis.expire(str, 10 * 60);
+            }
+            return socketUser;
+        } else {
+            ObjectMapper mapper = new ObjectMapper();
+            User user = null;
+            try {
+                user = mapper.readValue(json, User.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return new SocketUser(user);
+        }
     }
 
     @Override

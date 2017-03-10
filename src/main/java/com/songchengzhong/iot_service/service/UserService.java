@@ -1,7 +1,9 @@
 package com.songchengzhong.iot_service.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.songchengzhong.iot_service.entity.User;
 import com.songchengzhong.iot_service.view_model.RegisterUser;
+import com.songchengzhong.iot_service.view_model.SocketUser;
 
 import java.util.List;
 
@@ -17,7 +19,7 @@ public interface UserService {
     User login(String email, String password);
 
     //通过ApiKey找到用户
-    User findByApiKey(String apiKey);
+    SocketUser findByApiKey(String apiKey) throws JsonProcessingException;
 
     User findByEmail(String email);
 

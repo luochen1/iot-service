@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.songchengzhong.iot_service.common.Constants;
 import com.songchengzhong.iot_service.entity.User;
 import com.songchengzhong.iot_service.service.UserService;
+import com.songchengzhong.iot_service.view_model.SocketUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -21,7 +22,7 @@ public class ApiAuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String apiKey = request.getHeader(Constants.API_KEY);
-        User user = userService.findByApiKey(apiKey);
+        SocketUser user = userService.findByApiKey(apiKey);
         if (user == null) {
             response.setCharacterEncoding("utf-8");
             response.setContentType("application/json;charset=utf-8");

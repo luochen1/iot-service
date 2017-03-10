@@ -32,6 +32,12 @@ public class DataPointApiController {
         User user = (User) request.getAttribute("user");
         dataPoint.setSensorId(sensorId);//设置传感器的id
         if (dataPointService.insert(dataPoint, user)) {
+            //发送一个socket信息
+            try {
+                dataPointService.sendSocketMsg("in-time:" + user.getApikey() + ":" + sensorId, dataPoint);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return new ResponseEntity<>(dataPoint.getCreatedAt(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
