@@ -6,7 +6,7 @@ import com.songchengzhong.iot_service.config.RootConfig;
 import com.songchengzhong.iot_service.entity.User;
 import com.songchengzhong.iot_service.repository.UserRepository;
 import com.songchengzhong.iot_service.common.UUIDs;
-import com.songchengzhong.iot_service.view_model.WeiXinResp;
+import com.songchengzhong.iot_service.viewmodel.WeiXinResp;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

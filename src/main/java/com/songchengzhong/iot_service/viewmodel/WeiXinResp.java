@@ -1,4 +1,4 @@
-package com.songchengzhong.iot_service.view_model;
+package com.songchengzhong.iot_service.viewmodel;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.*;
 import lombok.AllArgsConstructor;

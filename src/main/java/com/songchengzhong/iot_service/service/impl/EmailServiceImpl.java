@@ -3,9 +3,11 @@ package com.songchengzhong.iot_service.service.impl;
 import com.songchengzhong.iot_service.entity.User;
 import com.songchengzhong.iot_service.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
@@ -39,7 +41,6 @@ public class EmailServiceImpl implements EmailService {
                 context.setVariable("user", user);
                 String message = thymeleaf.process("email/register", context);
                 helper.setText(message, true);
-
                 javaMailSender.send(mime);
 
             } catch (MessagingException e) {

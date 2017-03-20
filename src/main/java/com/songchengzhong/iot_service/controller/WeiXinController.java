@@ -1,8 +1,8 @@
 package com.songchengzhong.iot_service.controller;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.songchengzhong.iot_service.view_model.WeiXinRec;
-import com.songchengzhong.iot_service.view_model.WeiXinResp;
+import com.songchengzhong.iot_service.viewmodel.WeiXinRec;
+import com.songchengzhong.iot_service.viewmodel.WeiXinResp;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,11 +1,8 @@
 package com.songchengzhong.iot_service.controller;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.songchengzhong.iot_service.entity.User;
 import com.songchengzhong.iot_service.service.UserService;
-import com.songchengzhong.iot_service.view_model.RegisterUser;
-import com.songchengzhong.iot_service.view_model.WeiXinRec;
-import com.songchengzhong.iot_service.view_model.WeiXinResp;
+import com.songchengzhong.iot_service.viewmodel.RegisterUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,18 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.stream.Stream;
 
 /**
  * Created by songchengzhong on 2017/1/1.
@@ -47,15 +35,15 @@ public class HomeController {
     @PostMapping("/login")
     public String login(String email, String password, HttpSession session) {
         User user = userService.login(email, password);
-        if (user == null) {
-            return "redirect:/login";
-        } else {
+        if (user != null && user.isActive()) {
             Date lastLoginTime = user.getLoginTime();
             user.setLoginTime(new Date());
             userService.update(user);
             user.setLoginTime(lastLoginTime);
             session.setAttribute("user", user);
             return "redirect:/profile";
+        } else {
+            return "redirect:/login";
         }
     }
 
@@ -71,13 +59,23 @@ public class HomeController {
     @PostMapping("/register")
     public String register(@Valid RegisterUser registerUser, Errors errors, Model model, HttpSession session) {
         if (!errors.hasErrors() && userService.register(registerUser)) {
-            User user = userService.findByEmail(registerUser.getEmail().trim());
-            session.setAttribute("user", user);
-            return "redirect:/profile";//重定向
+            return "redirect:/login";
         } else {
             model.addAttribute("msg", "email重复啦");
             model.addAttribute("user", registerUser);
             return "home/register";
+        }
+    }
+
+    //验证邮箱
+    @GetMapping("/register/active")
+    public String registerVerify(String email, String code, HttpSession session) {
+        User user = userService.verifyActiveCode(email, code);
+        if (user != null) {
+            session.setAttribute("user", user);
+            return "redirect:/profile";
+        } else {
+            return "email/error";
         }
     }
 
@@ -87,6 +85,5 @@ public class HomeController {
         session.invalidate();
         return "redirect:/login";
     }
-
 
 }

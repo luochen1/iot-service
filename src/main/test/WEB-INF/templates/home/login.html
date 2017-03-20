@@ -34,19 +34,17 @@
 </div>
 <div class="am-g">
     <div class="am-u-lg-6 am-u-md-8 am-u-sm-centered">
-
-        <form method="post" class="am-form">
+        <form method="post" class="am-form" th:action="@{/login}">
             <label for="email">邮箱:</label>
-            <input type="email" name="" id="email" value="">
-            <br>
+            <input type="email" name="email" id="email" value="">
+            <span class="am-text-danger"></span>
             <label for="password">密码:</label>
-            <input type="password" name="" id="password" value="">
-            <br>
+            <input type="password" name="password" id="password" value="">
+            <span class="am-text-danger"></span>
             <label for="remember-me">
                 <input id="remember-me" type="checkbox">
                 记住密码
             </label>
-            <br/>
             <div class="am-cf">
                 <input type="submit" name="" value="登 录" class="am-btn am-btn-primary am-btn-sm am-fl">
                 <input type="submit" name="" value="忘记密码 ^_^? " class="am-btn am-btn-default am-btn-sm am-fr">

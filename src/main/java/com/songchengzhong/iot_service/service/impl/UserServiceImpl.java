@@ -8,8 +8,8 @@ import com.songchengzhong.iot_service.repository.UserRepository;
 import com.songchengzhong.iot_service.service.EmailService;
 import com.songchengzhong.iot_service.service.UserService;
 import com.songchengzhong.iot_service.common.UUIDs;
-import com.songchengzhong.iot_service.view_model.RegisterUser;
-import com.songchengzhong.iot_service.view_model.SocketUser;
+import com.songchengzhong.iot_service.viewmodel.RegisterUser;
+import com.songchengzhong.iot_service.viewmodel.SocketUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -17,7 +17,6 @@ import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.Socket;
 import java.util.Date;
 import java.util.List;
 
@@ -46,12 +45,11 @@ public class UserServiceImpl implements UserService {
                 e.printStackTrace();
             }
             user.setCreatedAt(new Date());
-            user.setActive(true);
+            user.setActive(false);
             user.setActiveCode(UUIDs.getUUID());
             user.setApikey(UUIDs.getUUID());
             if (userRepository.insert(user)) {
-//                emailService.sendRegisterCheckEmail(user);
-                //TODO
+                emailService.sendRegisterCheckEmail(user);
                 return true;
             }
         }
@@ -145,5 +143,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> toPagedList(int pageNum, int pageSize) {
         return userRepository.toPagedList(pageNum, pageSize);
+    }
+
+    @Override
+    public User verifyActiveCode(String email, String code) {
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
+            if (user.getActiveCode().equals(code)) {
+                user.setActive(true);
+                userRepository.update(user);
+                return user;
+            }
+        }
+        return null;
     }
 }

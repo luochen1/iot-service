@@ -2,8 +2,8 @@ package com.songchengzhong.iot_service.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.songchengzhong.iot_service.entity.User;
-import com.songchengzhong.iot_service.view_model.RegisterUser;
-import com.songchengzhong.iot_service.view_model.SocketUser;
+import com.songchengzhong.iot_service.viewmodel.RegisterUser;
+import com.songchengzhong.iot_service.viewmodel.SocketUser;
 
 import java.util.List;
 
@@ -34,5 +34,8 @@ public interface UserService {
     List<User> findAll();
 
     List<User> toPagedList(int pageNum, int pageSize);
+
+    //验证邮箱
+    User verifyActiveCode(String email, String code);
 
 }

@@ -1,16 +1,14 @@
-package com.songchengzhong.iot_service.view_model;
+package com.songchengzhong.iot_service.viewmodel;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.songchengzhong.iot_service.entity.Device;
 import com.songchengzhong.iot_service.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created by songchengzhong on 2017/1/1.
@@ -18,6 +16,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class SocketUser extends User implements Serializable {
 
     private int id;

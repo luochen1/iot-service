@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragment/layout}">
+<title layout:fragment="title">用户中心 - 我的账户</title>
+<style layout:fragment="css">
+
+    #apikey {
+        width: 40%;
+        float: left;
+        margin-right: 10px;
+    }
+</style>
+<div layout:fragment="main-content" class="am-panel am-panel-default main-content">
+    <div class="am-panel-hd">账户设置</div>
+    <div class="am-panel-body">
+        <form class="am-form am-g" method="post" th:action="@{/profile/update}">
+            <div class="am-form-group am-u-md-3">
+                <label for="username">用户名</label>
+                <input th:value="${user.username}" type="text" id="username" value="XXXX" disabled/>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-12">
+                <label for="apikey">API KEY</label>
+                <div>
+                    <input th:value="${user.apikey}" type="text" id="apikey" value="XXXXX" disabled/>
+                    <a class="am-btn am-btn-danger" id="apikey-generate">重新生成</a>
+                </div>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-5">
+                <label for="email">电子邮件</label>
+                <input th:value="${user.email}" type="email" id="email" value="XXXXX@qq.com" disabled/>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-11">
+                <label for="introduction">个人说明</label>
+                <textarea th:text="${user.introduction}" id="introduction" name="introduction" style="resize: none"
+                          rows="6">XXXXXX</textarea>
+            </div>
+            <div class="am-form-group am-u-md-12">
+                <input type="submit" value="保存" class="am-btn am-btn-success"/>
+            </div>
+        </form>
+    </div>
+</div>
+<script layout:fragment="js">
+    $("#apikey-generate").on("click", function () {
+        if (confirm("确定要重置API KEY吗?")) {
+            $.post("/profile/generate-apikey", {apikey: $("#apikey").val()}, function (data) {
+                $("#apikey").val(data);
+            })
+        }
+    });
+</script>
+</html>

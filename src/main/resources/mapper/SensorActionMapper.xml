@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.songchengzhong.iot_service.mapper.SensorActionMapper">
+    <resultMap id="sensorActionMap" type="sensorAction" autoMapping="true">
+        <id column="id" property="id"></id>
+        <result column="sensorId" property="sensorId"></result>
+        <result column="actionId" property="actionId"></result>
+        <association property="sensor" select="com.songchengzhong.iot_service.mapper.SensorMapper.findById"
+                     column="sensorId"></association>
+        <association property="action" select="com.songchengzhong.iot_service.mapper.ActionMapper.findById"
+                     column="actionId">
+        </association>
+    </resultMap>
+    <sql id="columnList">
+
+    </sql>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO iot_service.t_sensor_action(operator,value,content,actionId,sensorId)
+        VALUES (#{operator},#{value},#{content},#{actionId},#{sensorId});
+    </insert>
+    <update id="update">
+        UPDATE iot_service.t_sensor_action
+        <set>
+            <if test="operator != null">
+                operator = #{operator},
+            </if>
+            <if test="value != null">
+                value = #{value},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="actionId != null">
+                actionId = #{actionId},
+            </if>
+            <if test="sensorId != null">
+                sensorId = #{sensorId},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE from t_sensor_action
+        WHERE id = #{id}
+    </delete>
+
+    <select id="findById">
+        SELECT * FROM t_sensor_action
+        WHERE id = #{id}
+    </select>
+
+    <select id="findAll">
+        SELECT * FROM t_sensor_action
+    </select>
+
+    <select id="findBySensorId">
+        SELECT * FROM t_sensor_action
+        WHERE snesorId = #{sensorId}
+    </select>
+</mapper>

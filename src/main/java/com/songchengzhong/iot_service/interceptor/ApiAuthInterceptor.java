@@ -2,9 +2,8 @@ package com.songchengzhong.iot_service.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.songchengzhong.iot_service.common.Constants;
-import com.songchengzhong.iot_service.entity.User;
 import com.songchengzhong.iot_service.service.UserService;
-import com.songchengzhong.iot_service.view_model.SocketUser;
+import com.songchengzhong.iot_service.viewmodel.SocketUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;

@@ -21,8 +21,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
  * SpringMVC的配置文件
  */
 @Configuration
-@ComponentScan(basePackages = {"com.songchengzhong.iot_service.controller"
-        , "com.songchengzhong.iot_service.interceptor"})
+@ComponentScan(basePackages = {"com.songchengzhong.iot_service.controller"})
 @EnableWebMvc
 public class WebConfig extends WebMvcConfigurerAdapter {
 

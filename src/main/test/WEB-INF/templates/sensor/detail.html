@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragment/layout}">
+
+<title layout:fragment="title">用户中心 - 传感器详情</title>
+<style layout:fragment="css">
+    .am-panel-body {
+        padding: 0px;
+    }
+
+    .left-info {
+        text-align: center;
+        margin-top: 5%;
+    }
+
+    #switch-img {
+        background-image: url(../../../img/switch_status.png);
+        width: 65px;
+        height: 91px;
+        margin-left: 48%;
+    }
+
+    #switch-container {
+        text-align: center;
+        height: 400px;
+        width: 100%;
+    }
+
+    #info {
+        margin-top: 10%;
+    }
+</style>
+<div layout:fragment="main-content" th:object="${sensor}" class="am-panel am-panel-default main-content">
+    <div class="am-panel-hd">传感器详情</div>
+    <div class="am-panel-body">
+        <div class="am-g">
+            <div class="am-u-md-3 left-info">
+                <!--数值传感器-->
+                <th:block th:switch="*{sensorTypeId}">
+                    <img th:src="@{/img/sensor.png}" th:case="1">
+                    <img th:src="@{/img/switch.png}" th:case="2">
+                    <img th:src="@{/img/gps.png}" th:case="3">
+                    <img th:src="@{/img/gen.png}" th:case="4">
+                    <img th:src="@{/img/photocam.png}" th:case="5">
+                </th:block>
+                <p><strong th:text="*{name}"></strong></p>
+                <a th:href="@{/sensor/edit/{sensorId}(sensorId=*{id})}" class="am-btn am-btn-success">编辑</a>
+                <a th:href="@{/sensor/delete/{sensorId}(sensorId=*{id})}" class="am-btn am-btn-warning">删除</a>
+
+                <p th:href="*{description}"></p>
+            </div>
+            <div class="am-u-md-9" th:if="*{sensorTypeId == 1}">
+                <div id="chart" style="width: 100%;height: 400px"></div>
+                <p style="text-align: center">URL:<a href="#"
+                                                     th:text='${"http://"} + #{webSite} + ${"/api/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
+                    &nbsp;&nbsp;&nbsp;
+                    <a id="in-time-btn" class="am-btn am-btn-primary">开启 实时</a>
+                </p>
+            </div>
+            <div class="am-u-md-9" th:if="*{sensorTypeId == 2}">
+                <div id="switch-container">
+                    <p id="info"><strong>按动图标以改变开关的状态</strong></p>
+                    <div id="switch-img" style="cursor:pointer;"
+                         th:styleappend="${isOpen == '1'}?' background-position-x:-65px'">
+                    </div>
+                    <p style="text-align: center">URL:<a href="#"
+                                                         th:text='${"http://"} + #{webSite} + ${"/api/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../../js/echarts.min.js" th:src="@{/js/echarts.min.js}"></script>
+    <script th:if="${sensor.sensorTypeId == 1}" th:inline="javascript">
+        $(function () {
+            var chart = echarts.init(document.getElementById("chart"));
+            var unit = "[(${sensor.unit})]";
+            var symbol = "[(${sensor.symbol})]";
+            var sensorType = "[(${sensor.sensorType.nameCn})]"
+            /*显示所有的数据*/
+            function showAllData() {
+                var dataAndDate = /*[(${option})]*/[];
+                var data = dataAndDate.data;
+                var date = dataAndDate.date;
+                var option = {
+                    title: {//标题
+                        text: sensorType
+                    },
+                    tooltip: {},
+                    legend: {//图例说明
+                        data: [unit + symbol]
+                    },
+                    xAxis: {//x轴
+                        data: date
+                    },
+                    yAxis: {},
+                    dataZoom: {
+                        type: 'slider',//滑动
+                        show: true,
+                        xAxisIndex: 0,
+                        start: 0,//开始0%
+                        end: 100//结束100%
+                    },
+                    series: [
+                        {name: unit + symbol, type: 'line'/*'bar','line','scatter'*/, smooth: true, data: data}
+                    ]
+                }
+                chart.setOption(option);
+            }
+
+            showAllData();
+
+            var sock = null;
+            var api_key = "[(${session.user.apikey})]";
+            var sensorId = [[${sensor.id}]];
+            $("#in-time-btn").click(function () {
+                    this.style.display = "none";
+                    //建立socket链接
+                    var url = "ws://" + window.location.host + "/test";
+                    sock = new WebSocket(url);
+                    sock.onopen = function () {
+                        sock.send("in-time:" + api_key + ":" + sensorId);
+                        console.log("客户端open");
+                    }
+
+                    var data = [];
+                    var date = [];
+                    sock.onmessage = function (e) {
+                        if (e != null && e != "") {
+                            var msg = JSON.parse(e.data);
+                            data.push(msg.data);
+                            if (data.length > 10) {
+                                data.pop();
+                            }
+                            date.push(msg.date);
+                            if (date.length > 10) {
+                                date.pop();
+                            }
+                            chart.setOption({
+                                title: {//标题
+                                    text: sensorType + "(实时)"
+                                },
+                                tooltip: {},
+                                legend: {//图例说明
+                                    data: [unit + symbol]
+                                },
+                                xAxis: {//x轴
+                                    data: date
+                                },
+                                yAxis: {},
+                                series: [
+                                    {name: unit + symbol, type: 'line'/*'bar','line','scatter'*/, smooth: true, data: data}
+                                ]
+                            })
+                        }
+                    }
+
+                    sock.onclose = function () {
+                        console.log("socket关闭了");
+                    }
+                }
+            )
+        })
+    </script>
+    <script th:if="${sensor.sensorTypeId == 2}" th:inline="javascript">
+        $(function () {
+            var isOpen = [[${isOpen}]];
+            $("#switch-img").click(function () {
+                var out = this;
+                isOpen = isOpen == "1" ? "0" : "1";
+                $.post("[(@{/sensor/change-switch})]", {
+                    sensorId: "[[${sensor.id}]]",
+                    isOpen: isOpen
+                }, function (data) {
+                    if (data.result) {
+                        if (data.value == "1") {
+                            out.style.backgroundPositionX = "-65px";
+                            isOpen = "1";
+                        } else {
+                            out.style.backgroundPositionX = "0px";
+                            isOpen = "0";
+                        }
+                    }
+                })
+            });
+        })
+    </script>
+</div>
+<script layout:fragment="js" th:inline="javascript">
+
+</script>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragment/layout}">
+
+<title layout:fragment="title">用户中心 - 增加新传感器</title>
+<style layout:fragment="css">
+    #unit {
+        width: 80%;
+        display: inline-block;
+    }
+
+    #symbol {
+        width: 18%;
+        display: inline-block;
+    }
+
+    #unit-symbol {
+        position: relative;
+    }
+
+    #symbol-select {
+        display: none;
+        position: absolute;
+        right: -75px;
+        bottom: -45px;
+        background-color: #fff;
+        border: solid 1px #ccc;
+    }
+
+    .sensor_unit_symbol_item {
+        width: 27px;
+    }
+
+    .sensor_unit_symbol_item:hover {
+        background-color: dodgerblue;
+        cursor: pointer;
+    }
+</style>
+<div layout:fragment="main-content" th:object="${sensor}" class="am-panel am-panel-default main-content">
+    <div class="am-panel-hd">新增传感器</div>
+    <div class="am-panel-body">
+        <form class="am-form am-g" method="post" th:action="@{/sensor/create}">
+            <div class="am-form-group am-u-md-4">
+                <label for="name">传感器名称</label>
+                <input id="deviceId" name="deviceId" type="hidden" th:value="${deviceId}">
+                <input id="name" name="name" type="text" placeholder="用于区别其他传感器" th:value="*{name}">
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-4">
+                <label for="sensorTypeId">传感器类型</label><br/>
+                <select id="sensorTypeId" name="sensorTypeId" th:if="${sensorTypes}">
+                    <option th:each="sensorType : ${sensorTypes}" th:text="${sensorType.nameCn}"
+                            th:value="${sensorType.id}" th:selected="${sensorType.id} eq *{sensorTypeId}"></option>
+                </select>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-4" id="unit-symbol-group">
+                <label>单位/符号</label>
+                <div id="unit-symbol">
+                    <input id="unit" name="unit" placeholder="例:摄氏度" type="text" th:value="*{unit}"/>
+                    <input id="symbol" name="symbol" placeholder="例:℃" type="text" th:value="*{symbol}"/>
+                    <div id="symbol-select">
+                        <table style="background: #fff; border: solid 1px #ccc">
+                            <tr>
+                                <td class="sensor_unit_symbol_item">°C</td>
+                                <td class="sensor_unit_symbol_item">℉</td>
+                                <td class="sensor_unit_symbol_item">Ω</td>
+                            </tr>
+                            <tr>
+                                <td class="sensor_unit_symbol_item">㎡</td>
+                                <td class="sensor_unit_symbol_item">Pa</td>
+                                <td class="sensor_unit_symbol_item">Kg</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-11">
+                <label for="description">描述</label>
+                <textarea th:text="*{description}" id="description" name="description" style="resize: none" rows="3"
+                          maxlength="50"
+                          placeholder="不超过50个字符"></textarea>
+            </div>
+            <div class="am-cf"></div>
+            <div class="am-form-group am-u-md-12">
+                <input type="reset" value="重置" class="am-btn am-btn-warning">
+                <input type="submit" value="保存" class="am-btn am-btn-success"/>
+            </div>
+        </form>
+    </div>
+</div>
+<script layout:fragment="js">
+    $(function () {
+        $("#sensorTypeId").change(function () {
+            if (this.value == "1") {
+                $("#unit-symbol-group").show();
+            } else {
+                $("#unit-symbol-group").hide();
+            }
+        })
+
+        $("#symbol").focus(function () {
+            $("#symbol-select").show();
+        }).blur(function () {
+            $("#symbol-select").fadeOut();
+        });
+        console.log($(".sensor_unit_symbol_item"));
+        $(".sensor_unit_symbol_item").click(function () {
+            console.log("click");
+            console.log(this);
+            console.log(this.innerHTML);
+            $("#symbol").val(this.innerText);
+        });
+    })
+</script>
+</html>
