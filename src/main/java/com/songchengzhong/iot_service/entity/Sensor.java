@@ -43,4 +43,7 @@ public class Sensor {
 
     @JsonIgnore
     private List<DataPoint> dataPoints;
+
+    @JsonIgnore
+    private List<SensorAction> sensorActions;
 }

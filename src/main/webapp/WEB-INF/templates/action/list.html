@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragment/layout}">
+<title layout:fragment="title">用户中心 - 动作设备</title>
+<style layout:fragment="css">
+    .am-panel-body {
+        padding-left: 10px;
+        padding-bottom: 15px;
+    }
+
+    .am-panel-body .am-g {
+        padding-top: 10px;
+    }
+</style>
+<div layout:fragment="main-content" class="am-panel am-panel-default main-content">
+    <div class="am-panel-hd">提醒动作</div>
+    <div class="am-panel-body">
+        <div class="am-g">
+            <div class="am-u-md-12">
+                <table class="am-table">
+                    <tr>
+                        <th>动作名称</th>
+                        <th>推送类型</th>
+                        <th>推送策略</th>
+                        <th>操作</th>
+                    </tr>
+                    <tr th:each="action : ${actions}">
+                        <td th:text="${action.name}">XXXX</td>
+                        <td th:if="${action.actionType.name eq 'email'}" th:text="电子邮件">XXXX</td>
+                        <td th:if="${action.actionType.name eq 'http_url'}" th:text="网址推送"></td>
+                        <td th:text="${action.value}">XXXX</td>
+                        <td><a th:href="@{/action/delete/{actionId}(actionId=${action.id})}"
+                               onclick="return confirm('确定删除吗?')" class="am-btn am-btn-warning">删除</a>
+                        </td>
+                    </tr>
+                </table>
+                <a class="am-btn am-btn-success" th:href="@{/action/new}">添加新动作</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script layout:fragment="js">
+</script>
+</html>

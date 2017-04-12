@@ -22,6 +22,7 @@
             <mvc:mapping path="/profile/**/"/>
             <mvc:mapping path="/device/**/"/>
             <mvc:mapping path="/sensor/**/"/>
+            <mvc:mapping path="/action/**/"/>
             <bean class="com.songchengzhong.iot_service.interceptor.UserAuthInterceptor"></bean>
         </mvc:interceptor>
     </mvc:interceptors>

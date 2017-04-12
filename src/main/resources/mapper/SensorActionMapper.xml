@@ -13,13 +13,12 @@
                      column="actionId">
         </association>
     </resultMap>
-    <sql id="columnList">
 
-    </sql>
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO iot_service.t_sensor_action(operator,value,content,actionId,sensorId)
         VALUES (#{operator},#{value},#{content},#{actionId},#{sensorId});
     </insert>
+
     <update id="update">
         UPDATE iot_service.t_sensor_action
         <set>
@@ -47,17 +46,19 @@
         WHERE id = #{id}
     </delete>
 
-    <select id="findById">
+    <select id="findById" resultMap="sensorActionMap">
         SELECT * FROM t_sensor_action
         WHERE id = #{id}
     </select>
 
-    <select id="findAll">
+    <select id="findAll" resultMap="sensorActionMap">
         SELECT * FROM t_sensor_action
+        ORDER BY  id DESC
     </select>
 
-    <select id="findBySensorId">
+    <select id="findBySensorId" resultMap="sensorActionMap">
         SELECT * FROM t_sensor_action
-        WHERE snesorId = #{sensorId}
+        WHERE sensorId = #{sensorId}
+        ORDER BY  id DESC
     </select>
 </mapper>

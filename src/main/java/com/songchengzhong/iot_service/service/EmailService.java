@@ -9,4 +9,7 @@ public interface EmailService {
 
     //发送账户验证email
     void sendRegisterCheckEmail(User user);
+
+    //发送NormalEmail
+    void sendEmail(String sendTo, String text);
 }

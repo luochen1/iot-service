@@ -30,6 +30,7 @@
         <mapper resource="mapper/SensorTypeMapper.xml"></mapper>
         <mapper resource="mapper/SensorMapper.xml"></mapper>
         <mapper resource="mapper/DataPointMapper.xml"></mapper>
+        <mapper resource="mapper/ActionTypeMapper.xml"></mapper>
         <mapper resource="mapper/ActionMapper.xml"></mapper>
         <mapper resource="mapper/SensorActionMapper.xml"></mapper>
     </mappers>

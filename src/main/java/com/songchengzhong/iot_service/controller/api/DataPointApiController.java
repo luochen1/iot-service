@@ -2,6 +2,7 @@ package com.songchengzhong.iot_service.controller.api;
 
 import com.songchengzhong.iot_service.entity.DataPoint;
 import com.songchengzhong.iot_service.entity.User;
+import com.songchengzhong.iot_service.service.ActionService;
 import com.songchengzhong.iot_service.service.DataPointService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,10 @@ import java.util.List;
 public class DataPointApiController {
     @Autowired
     DataPointService dataPointService;
+
+    @Autowired
+    ActionService actionService;
+
     @Autowired(required = false)
     HttpServletRequest request;
 
@@ -38,6 +43,9 @@ public class DataPointApiController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            //触发对应的动作
+            actionService.TriggerAction(user,dataPoint);
+
             return new ResponseEntity<>(dataPoint.getCreatedAt(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

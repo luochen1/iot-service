@@ -30,6 +30,10 @@
     #info {
         margin-top: 10%;
     }
+
+    .sensor-trigger {
+        padding: 5px 40px;
+    }
 </style>
 <div layout:fragment="main-content" th:object="${sensor}" class="am-panel am-panel-default main-content">
     <div class="am-panel-hd">传感器详情</div>
@@ -53,7 +57,7 @@
             <div class="am-u-md-9" th:if="*{sensorTypeId == 1}">
                 <div id="chart" style="width: 100%;height: 400px"></div>
                 <p style="text-align: center">URL:<a href="#"
-                                                     th:text='${"http://"} + #{webSite} + ${"/api/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
+                                                     th:text='#{webSite} + ${"/api/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
                     &nbsp;&nbsp;&nbsp;
                     <a id="in-time-btn" class="am-btn am-btn-primary">开启 实时</a>
                 </p>
@@ -65,11 +69,59 @@
                          th:styleappend="${isOpen == '1'}?' background-position-x:-65px'">
                     </div>
                     <p style="text-align: center">URL:<a href="#"
-                                                         th:text='${"http://"} + #{webSite} + ${"/api/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
+                                                         th:text='#{webSite} + ${"/api/devices/" + sensor.deviceId + "/sensors/" +sensor.id+"/datapoints"}'></a>
                     </p>
                 </div>
             </div>
         </div>
+
+        <!--展示传感的动作触发-->
+        <div class="am-g">
+            <div class="am-u-md-12 sensor-trigger">
+                <ul class="am-list">
+                    <li th:each="sensorAction:${sensor.sensorActions}">
+                        [['当数值'+${sensorAction.operator}+${sensorAction.value}+'时,触发动作:'+${sensorAction.action.name}]]
+                        <a href="#" style="display: inline-block">删除</a>
+                    </li>
+                </ul>
+                <button class="am-btn am-btn-success" id="trigger-btn">+ 添加触发</button>
+                <br/>
+                <div class="am-panel am-panel-default am-u-md-8 am-hide" id="trigger-panel">
+                    <form class="am-form" th:action="@{/sensor/new-sensor-action}" method="post">
+                        <input type="hidden" name="sensorId" th:value="${sensor.id}"/>
+                        <div class="am-form-group">
+                            <label>比较符号:</label>
+                            <select name="operator">
+                                <option value=">">&gt;</option>
+                                <option value="=">&equals;</option>
+                                <option value="<">&lt;</option>
+                            </select>
+                        </div>
+                        <div class="am-form-group">
+                            <label>比较数值</label>
+                            <input type="text" name="value"/>
+                        </div>
+                        <div class="am-form-group">
+                            <label>选择动作(触发策略)</label>
+                            <select name="actionId">
+                                <option th:if="${actions}" th:each="action:${actions}" th:text="${action.name}"
+                                        th:value="${action.id}"></option>
+                            </select>
+                        </div>
+                        <div class="am-form-group">
+                            <label>内容</label>
+                            <textarea name="content" cols="10" rows="5"
+                                      placeholder='当上面指定的事件被触发时, 该消息将被发送.如果指定动作为开关，消息内容格式为"{"value":值}"，值为"0"表示关闭，值为"1"表示打开.如果指定动作为传感器，消息内容自定义，用$value可以获取当前value值，若要$value保持原样，则用两个以上的"$"，如$$value.'></textarea>
+                        </div>
+                        <div class="am-form-group">
+                            <input type="submit" value="添加" class="am-btn am-btn-success"
+                                   onclick="return confirm('确定添加吗?')"/>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
     </div>
     <script src="../../../js/echarts.min.js" th:src="@{/js/echarts.min.js}"></script>
     <script th:if="${sensor.sensorTypeId == 1}" th:inline="javascript">
@@ -188,6 +240,8 @@
     </script>
 </div>
 <script layout:fragment="js" th:inline="javascript">
-
+    $("#trigger-btn").click(function () {
+        $("#trigger-panel").removeClass("am-hide");
+    })
 </script>
 </html>

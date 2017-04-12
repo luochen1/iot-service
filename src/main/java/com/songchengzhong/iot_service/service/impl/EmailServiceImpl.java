@@ -48,4 +48,22 @@ public class EmailServiceImpl implements EmailService {
             }
         }).run();
     }
+
+    @Override
+    public void sendEmail(String sendTo, String text) {
+        new Thread(() -> {
+            MimeMessage mime = javaMailSender.createMimeMessage();
+            try {
+                MimeMessageHelper helper = new MimeMessageHelper(mime, true, "utf-8");
+                helper.setFrom("scz0216@126.com");
+                helper.setTo(sendTo);
+                helper.setSubject("物联网云服务通知");
+                //创建消息
+                helper.setText(text, true);
+                javaMailSender.send(mime);
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            }
+        }).run();
+    }
 }

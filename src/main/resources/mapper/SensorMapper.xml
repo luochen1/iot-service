@@ -14,6 +14,9 @@
                      column="sensorTypeId"></association>
         <collection property="dataPoints" select="com.songchengzhong.iot_service.mapper.DataPointMapper.findBySensorId"
                     column="id"></collection>
+        <collection property="sensorActions"
+                    select="com.songchengzhong.iot_service.mapper.SensorActionMapper.findBySensorId"
+                    column="id"></collection>
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">

@@ -15,6 +15,7 @@ public class Action {
     private String name;
     private String value;
     private int actionTypeId;
+    private int userId;
 
     private ActionType actionType;
     private User user;

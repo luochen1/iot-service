@@ -2,10 +2,8 @@ package com.songchengzhong.iot_service.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.songchengzhong.iot_service.entity.DataPoint;
-import com.songchengzhong.iot_service.entity.Sensor;
-import com.songchengzhong.iot_service.entity.SensorType;
-import com.songchengzhong.iot_service.entity.User;
+import com.songchengzhong.iot_service.entity.*;
+import com.songchengzhong.iot_service.service.ActionService;
 import com.songchengzhong.iot_service.service.DataPointService;
 import com.songchengzhong.iot_service.service.SensorService;
 import com.songchengzhong.iot_service.service.SensorTypeService;
@@ -35,6 +33,9 @@ public class SensorController {
 
     @Autowired
     SensorService sensorService;
+
+    @Autowired
+    ActionService actionService;
 
     @Autowired
     DataPointService dataPointService;
@@ -68,7 +69,7 @@ public class SensorController {
         Sensor sensor = sensorService.findById(id, user);
         List<DataPoint> dataPoints = sensor.getDataPoints();//找到所有的数据
         if (dataPoints == null) {
-            System.out.println("null");
+            System.out.println(this.getClass().toString() + ":datail():dataPoints:null");
         }
         if (sensor == null) {
             return "redirect:/profile";
@@ -88,6 +89,7 @@ public class SensorController {
                 case 5:
                     break;
             }
+            model.addAttribute("actions", actionService.findAllActionByUser(user));
             model.addAttribute("sensor", sensor);
             return "sensor/detail";
         }
@@ -107,5 +109,11 @@ public class SensorController {
             map.put("value", before);
         }
         return map;
+    }
+
+    @PostMapping("/new-sensor-action")
+    public String addSensorAction(SensorAction sensorAction) {
+        sensorService.addSensorAction(sensorAction);
+        return "redirect:/sensor/detail/" + sensorAction.getSensorId();
     }
 }

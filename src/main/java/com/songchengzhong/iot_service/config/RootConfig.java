@@ -21,6 +21,7 @@ import java.util.Properties;
 @ComponentScan(basePackages = {"com.songchengzhong.iot_service"}, excludeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, classes = EnableWebMvc.class)})
 @ImportResource(locations = "classpath:spring-config.xml")
 @Import(WebConfig.class)
+@PropertySource("classpath:Messages_zh.properties")
 public class RootConfig {
 
     /*

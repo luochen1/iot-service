@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragment/layout}">
+<title layout:fragment="title">用户中心 - 添加动作</title>
+<style layout:fragment="css">
+    .am-panel-body {
+        padding-left: 10px;
+        padding-bottom: 15px;
+    }
+
+    .am-panel-body .am-g {
+        padding-top: 10px;
+    }
+</style>
+<div layout:fragment="main-content" class="am-panel am-panel-default main-content">
+    <div class="am-panel-hd">添加动作</div>
+    <div class="am-panel-body">
+        <div class="am-g">
+            <div class="am-u-md-12">
+                <form class="am-form" th:action="@{/action/new}" method="post">
+                    <div class="am-form-group">
+                        <label for="actionName">动作名</label>
+                        <input type="text" id="actionName" placeholder="请输入动作名" name="actionName">
+                    </div>
+                    <div class="am-form-group">
+                        <label for="actionType">类型</label>
+                        <select id="actionType" name="actionType">
+                            <option value="1">电子邮件</option>
+                            <option value="2">网址推送</option>
+                        </select>
+                    </div>
+                    <div class="am-form-group type-choice">
+                        <label for="emailAddress">邮箱地址</label>
+                        <input type="email" id="emailAddress" placeholder="请输入邮箱" name="emailAddress">
+                    </div>
+                    <div class="am-form-group type-choice am-hide">
+                        <label>推送到开关<input type="radio" value="1" name="actionSubType" checked/></label>
+                        <label>推送到其他网址<input type="radio" value="2" name="actionSubType"/></label>
+                        <div class="sub-type-choice">
+                            <select name="switchType">
+                                <option th:each="sensor:${sensors}" th:text="${sensor.name}"
+                                        th:value="${sensor.id}"></option>
+                            </select>
+                        </div>
+                        <div class="sub-type-choice am-hide">
+                            <input name="httpURL" type="text"/>推送到其他网站
+                        </div>
+                    </div>
+                    <div class="am-form-group">
+                        <input type="submit" value="保存" class="am-btn am-btn-success"
+                               onclick="return confirm('确定保存吗?')"/>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script layout:fragment="js">
+    $("#actionType").change(function () {
+        $typeChoice = $(".type-choice");
+        if (this.value == 1) {
+            $typeChoice.eq(0).removeClass("am-hide");
+            $typeChoice.eq(1).addClass("am-hide");
+        } else if (this.value == 2) {
+            $typeChoice.eq(0).addClass("am-hide");
+            $typeChoice.eq(1).removeClass("am-hide");
+        }
+    });
+    $("input[name='actionSubType']").change(function () {
+        $subTypeChoice = $(".sub-type-choice");
+        if (this.value == 1) {
+            $subTypeChoice.eq(0).removeClass("am-hide");
+            $subTypeChoice.eq(1).addClass("am-hide");
+        } else if (this.value == 2) {
+            $subTypeChoice.eq(0).addClass("am-hide");
+            $subTypeChoice.eq(1).removeClass("am-hide");
+        }
+    })
+</script>
+</html>

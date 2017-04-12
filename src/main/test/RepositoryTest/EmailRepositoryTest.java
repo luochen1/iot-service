@@ -26,4 +26,9 @@ public class EmailRepositoryTest {
         user.setEmail("756452318@qq.com");
         emailService.sendRegisterCheckEmail(user);
     }
+
+    @Test
+    public void send(){
+        emailService.sendEmail("756452318@qq.com","test文本哈哈哈哈哈");
+    }
 }
